@@ -18,7 +18,7 @@ local tof = function(Val)
     end
     local cls = {}
     cls.value = inner(Val)
-    return cls
+    return cls.value
 end
 
 local createClass = function()
