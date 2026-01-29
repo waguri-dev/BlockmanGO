@@ -31,7 +31,7 @@ function io.open(path, mode)
             "%.so$"
         }
     ) do
-        if path:find(v) or strip(path):find(strip(v)) then
+        if path:match(v) or strip(path):match(strip(v)) then
             trig = true
             break
         end
@@ -41,3 +41,23 @@ function io.open(path, mode)
     end
     return ioOpen(path, mode)
 end
+
+if package.searchers[2] then
+    local ch = {} 
+    local lloader = package.searchers[2]
+    package.searchers[2] = function(...)
+        print("tryCallLoad, init var(isAC)")
+        local isAC = false
+        local args = {...}
+        for _, arg in pairs(args) do
+            if type(arg) == "string" then
+                if arg:match("proc/self/maps") or arg:match("proc/self/mem") then
+                    isAC = true
+                end
+            end
+        end
+        if isAC then
+            return false
+        end
+        return lloader(table.unpack(args))
+    end
