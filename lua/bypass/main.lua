@@ -2,30 +2,22 @@ local oldStrSub = string.sub
 local cache = {}
 function string.sub(s, i, j)
     if s:find("ELF") or s:find("ZN8") or s:find("_ZN8") then
-        local X = {}
-        cache[s] = oldStrSub(s, i, j)
-        for _, str in pairs(cache) do
-            if str == "E" then
-                if not X[str] then
-                    X[#X + 1] = str
-                end
-            elseif str == "L" then
-                if not X[str] then
-                    X[#X + 1] = str
-                end
-            elseif str == "F" then
-                if not X[str] then
-                    X[#X + 1] = str
-                end
-            end
-        end
-        local data = table.concat(X)
-        if data == "ELF" then
-            cache = {}
-            return "A"
-        end
+        return "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     end
     return oldStrSub(s, i, j)
+end
+
+local function strip(str)
+    local b = {
+        "_",
+        "/",
+        "\\",
+        "//"
+    }
+    for i, v in pairs(b) do
+        str = str:gsub(v, "")
+    end
+    return str
 end
 
 local ioOpen = io.open
@@ -39,7 +31,7 @@ function io.open(path, mode)
             "%.so$"
         }
     ) do
-        if path:find(v) then
+        if path:find(v) or strip(path):find(strip(v)) then
             trig = true
             break
         end
